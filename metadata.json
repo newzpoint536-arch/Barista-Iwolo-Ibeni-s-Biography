@@ -1,0 +1,6 @@
+{
+  "name": "Barrister Ibeni Iwolo Memorial",
+  "description": "A prestigious digital memorial, legal archive, and interactive biography celebrating the quiet influence and enduring legacy of Late Barrister Ibeni Iwolo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
