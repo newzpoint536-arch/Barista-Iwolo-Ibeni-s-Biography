@@ -1507,36 +1507,36 @@ export default function App() {
 
         {/* TAB 4: GUESTBOOK / MEMORIAL WALL */}
         {activeTab === "guestbook" && (
-          <div className="space-y-12" id="guestbook-section">
-            <div className="text-center max-w-2xl mx-auto space-y-2">
-              <span className="text-[#eab308] text-xs font-cinzel tracking-[0.3em] font-bold uppercase">Community Chronicles</span>
-              <h2 className="font-cinzel text-3xl font-black">Digital Memorial Guestbook</h2>
-              <p className="text-sm text-slate-400 leading-relaxed">
+          <div className="space-y-8 sm:space-y-12" id="guestbook-section">
+            <div className="text-center max-w-2xl mx-auto space-y-2 px-4">
+              <span className="text-[#eab308] text-xs font-cinzel tracking-[0.3em] font-bold uppercase block">Community Chronicles</span>
+              <h2 className="font-cinzel text-2xl sm:text-3xl font-black">Digital Memorial Guestbook</h2>
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                 Offer your sincere condolences, record a testimony of his support, and ignite a digital flame of honoring remembrance.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start max-w-5xl mx-auto">
+            <div className="flex flex-col max-w-3xl mx-auto px-4 sm:px-6 space-y-8">
               
               {/* Left Column: Register guest text */}
-              <div className="lg:col-span-5 bg-[#070b14] border border-slate-900 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-5 sticky top-28">
+              <div className="w-full bg-[#070b14]/90 border border-slate-900 p-5 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl space-y-5">
                 
                 <div className="space-y-1.5">
                   <h3 className="font-cinzel text-yellow-500 text-xs uppercase tracking-[0.15em] font-bold">Registry Form</h3>
-                  <h4 className="font-playfair text-xl font-bold">Write Your Testimony</h4>
+                  <h4 className="font-playfair text-lg sm:text-xl font-bold">Write Your Testimony</h4>
                   <p className="text-xs text-slate-400 leading-relaxed">
                     Once submitted, your tribute message will immediately appear on the digital memorial wall catalog below.
                   </p>
                 </div>
 
                 {formError && (
-                  <div className="p-3.5 rounded-lg bg-red-950/40 border border-red-900/40 text-red-400 text-xs">
+                  <div className="p-3 bg-red-950/40 border border-red-900/40 text-red-400 text-xs rounded-lg">
                     ⚠️ {formError}
                   </div>
                 )}
 
                 {formSuccess && (
-                  <div className="p-3.5 rounded-lg bg-emerald-950/40 border border-emerald-950 text-emerald-300 text-xs flex items-center gap-2">
+                  <div className="p-3 bg-emerald-950/40 border border-emerald-950 text-emerald-300 text-xs rounded-lg flex items-center gap-2">
                     <Check size={14} className="text-emerald-400" /> Safe registry! Your message has been entered with honor.
                   </div>
                 )}
@@ -1546,7 +1546,7 @@ export default function App() {
                     <label className="block text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Your Full Name</label>
                     <input
                       type="text"
-                      className="w-full bg-[#03060c] border border-slate-800 rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#d4af37]"
+                      className="w-full h-11 sm:h-10 bg-[#03060c] border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]/20 transition-all font-sans"
                       placeholder="e.g. Chief Tonye Okolobiri"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -1558,7 +1558,7 @@ export default function App() {
                     <label className="block text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Relationship / Designation</label>
                     <input
                       type="text"
-                      className="w-full bg-[#03060c] border border-slate-800 rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#d4af37]"
+                      className="w-full h-11 sm:h-10 bg-[#03060c] border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]/20 transition-all font-sans"
                       placeholder="e.g. Learned Magistrate / Family Friend"
                       value={formData.relation}
                       onChange={(e) => setFormData({ ...formData, relation: e.target.value })}
@@ -1568,7 +1568,7 @@ export default function App() {
                   <div className="space-y-1.5">
                     <label className="block text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Registry Category</label>
                     <select
-                      className="w-full bg-[#03060c] border border-slate-800 rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#d4af37]"
+                      className="w-full h-11 sm:h-10 bg-[#03060c] border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]/20 transition-all font-sans cursor-pointer"
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     >
@@ -1582,7 +1582,7 @@ export default function App() {
                   <div className="space-y-1.5">
                     <label className="block text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Heartfelt Message</label>
                     <textarea
-                      className="w-full bg-[#03060c] border border-slate-800 rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#d4af37] min-h-[110px]"
+                      className="w-full bg-[#03060c] border border-slate-800 rounded-lg px-3 py-2.5 text-xs text-white focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]/20 transition-all font-serif min-h-[100px] sm:min-h-[110px]"
                       placeholder="Share your testimonies or remembrance words representing Barrister's impact on your path..."
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
@@ -1594,7 +1594,8 @@ export default function App() {
                   <button
                     type="submit"
                     disabled={submittingTribute}
-                    className="w-full py-3 bg-gradient-to-r from-[#ca8a04] to-[#eab308] text-black font-cinzel font-bold text-xs uppercase tracking-widest rounded-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+                    className="w-full py-3 bg-gradient-to-r from-[#ca8a04] to-[#eab308] text-black font-cinzel font-bold text-xs uppercase tracking-widest rounded-lg hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer flex items-center justify-center"
+                    id="btn-tribute-submit"
                   >
                     {submittingTribute ? "Preserving..." : "Publish to Memorial Wall"}
                   </button>
@@ -1602,25 +1603,25 @@ export default function App() {
 
               </div>
 
-              {/* Right Column: Active tributes */}
-              <div className="lg:col-span-7 space-y-6">
+              {/* Card 2 & Stream Container: Active tributes list */}
+              <div className="w-full space-y-6">
                 
-                {/* Visual selector filter for category */}
-                <div className="flex flex-wrap gap-2 pb-3 border-b border-slate-900">
+                {/* Horizontal scroll index-based filter categories block on mobile */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-3 border-b border-slate-900/60 scrollbar-none whitespace-nowrap -mx-4 px-4 sm:mx-0 sm:px-0">
                   {[
-                    { id: "all", label: "All Tributes" },
-                    { id: "family", label: "Family" },
-                    { id: "colleague", label: "Legal" },
-                    { id: "church", label: "Faith" },
-                    { id: "community", label: "Regional" }
+                    { id: "all", label: "All Records" },
+                    { id: "family", label: "Family & Kin" },
+                    { id: "colleague", label: "Legal Colleague" },
+                    { id: "church", label: "Christian Faith" },
+                    { id: "community", label: "Regional / INC" }
                   ].map((cat) => (
                     <button
                       key={cat.id}
                       onClick={() => setTributeCategory(cat.id as any)}
-                      className={`px-3 py-1.5 rounded-lg text-xxs font-semibold uppercase tracking-wider transition-all duration-300 ${
+                      className={`px-3.5 py-2 rounded-lg text-[10px] sm:text-xs font-cinzel font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                         tributeCategory === cat.id 
-                          ? "bg-[#eab308]/15 border border-[#eab308]/30 text-yellow-500" 
-                          : "text-slate-400 hover:text-white"
+                          ? "bg-[#eab308]/15 border border-[#eab308]/35 text-yellow-500 shadow-sm shadow-yellow-500/5" 
+                          : "bg-slate-950/40 border border-slate-900/40 text-slate-400 hover:text-white hover:border-slate-800"
                       }`}
                     >
                       {cat.label}
@@ -1631,39 +1632,47 @@ export default function App() {
                 {loadingTributes ? (
                   <div className="text-center py-12 text-slate-500">
                     <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-yellow-500 mx-auto mb-2" />
-                    <p className="font-serif">Opening registry manuscripts...</p>
+                    <p className="font-serif text-sm">Opening registry manuscripts...</p>
                   </div>
                 ) : (
-                  <div className="space-y-5">
+                  <div className="space-y-4 sm:space-y-5">
                     {filteredTributes.map((trib) => (
                       <div
                         key={trib.id}
-                        className="bg-[#070b14]/50 border border-slate-900/80 rounded-2xl p-6 transition-all duration-300 hover:border-[#eab308]/20 relative group"
+                        className="bg-[#070b14]/50 border border-slate-900/80 rounded-xl sm:rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:border-[#eab308]/20 relative group"
                       >
-                        {/* Memorial lit candle box */}
-                        <div className="absolute top-6 right-6 flex items-center gap-1.5 bg-[#ca8a04]/10 border border-[#ca8a04]/20 px-2.5 py-1 rounded-full text-xxs text-yellow-500">
-                          <Flame size={12} className="text-yellow-500 candle-flicker" /> 
-                          <span>{trib.candlesLit || 1} Flame Lit</span>
+                        
+                        {/* Header Area styled responsively for mobile to avoid overlap */}
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-3 border-b border-slate-900/60">
+                          <div className="space-y-1">
+                            <h4 className="font-cinzel text-sm sm:text-md text-slate-100 font-bold group-hover:text-[#eab308] transition-colors leading-tight">
+                              {trib.name}
+                            </h4>
+                            <p className="text-[10px] uppercase text-stone-500 font-mono tracking-wider font-semibold">
+                              👤 {trib.relation} • {trib.category.toUpperCase()}
+                            </p>
+                          </div>
+                          
+                          {/* Memorial lit candle box */}
+                          <div className="flex items-center gap-1.5 bg-[#ca8a04]/10 border border-[#ca8a04]/20 px-2.5 py-1 rounded-full text-[10px] text-yellow-500 self-start sm:self-center">
+                            <Flame size={12} className="text-yellow-500 candle-flicker" /> 
+                            <span>{trib.candlesLit || 1} Flame Lit</span>
+                          </div>
                         </div>
 
-                        <div className="space-y-2 max-w-[85%]">
-                          <h4 className="font-cinzel text-md text-slate-100 font-bold group-hover:text-[#eab308] transition-colors leading-tight">
-                            {trib.name}
-                          </h4>
-                          <p className="text-[10px] uppercase text-stone-500 font-mono tracking-wider font-semibold">
-                            👤 {trib.relation} • {trib.category.toUpperCase()}
-                          </p>
-                          <p className="text-slate-300 text-xs md:text-sm font-light leading-relaxed whitespace-pre-line border-t border-slate-900/60 pt-3 italic">
+                        {/* Tribute Quote Message Description Panel */}
+                        <div className="pt-3">
+                          <p className="text-slate-300 text-xs sm:text-sm font-light leading-relaxed whitespace-pre-line italic font-serif">
                             "{trib.message}"
                           </p>
                         </div>
 
-                        {/* Interactive Spark: Click to light additional candle and Share */}
-                        <div className="mt-4 pt-3 border-t border-slate-900/60 flex flex-wrap items-center justify-between gap-2">
+                        {/* Interactive Spark Footer: Click to light additional candle & Transmit sharing */}
+                        <div className="mt-4 pt-3 border-t border-slate-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#03060c]/20 -mx-4 -mb-4 p-4 rounded-b-xl sm:rounded-b-2xl sm:mx-0 sm:mb-0 sm:bg-transparent sm:p-0">
                           <span className="text-[10px] text-slate-500 font-mono">
                             Registered on {trib.date}
                           </span>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2.5 w-full sm:w-auto">
                             <button
                               onClick={() => {
                                 setShareItem({
@@ -1674,19 +1683,19 @@ export default function App() {
                                 });
                                 setIsShareModalOpen(true);
                               }}
-                              className="inline-flex items-center gap-1.5 text-[10px] font-cinzel font-bold text-slate-400 hover:text-white hover:bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800 transition-all cursor-pointer"
+                              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 text-xs font-cinzel font-bold text-slate-400 hover:text-white hover:bg-slate-900 px-4 h-11 sm:h-9 bg-slate-950/35 rounded-lg border border-slate-800 active:scale-[0.97] transition-all cursor-pointer"
                               id={`btn-share-tribute-${trib.id}`}
                               title="Share this tribute card"
                             >
-                              <Share2 size={11} />
+                              <Share2 size={12} />
                               <span>Share</span>
                             </button>
 
                             <button
                               onClick={() => handleLightCandle(trib.id)}
-                              className="inline-flex items-center gap-1 text-[10px] font-cinzel font-bold text-yellow-500 hover:text-white hover:bg-[#eab308]/10 px-2.5 py-1 rounded-lg border border-[#eab308]/20 transition-all cursor-pointer"
+                              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 text-xs font-cinzel font-bold text-yellow-500 hover:text-white hover:bg-[#eab308]/20 px-4 h-11 sm:h-9 bg-[#eab308]/5 rounded-lg border border-[#eab308]/25 active:scale-[0.97] transition-all cursor-pointer"
                             >
-                              🔥 Light Virtual Candle
+                              🔥 Light Candle
                             </button>
                           </div>
                         </div>
