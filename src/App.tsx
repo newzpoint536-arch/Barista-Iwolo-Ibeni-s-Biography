@@ -501,7 +501,7 @@ export default function App() {
                 <div className="absolute -inset-1.5 rounded-2xl bg-gradient-to-r from-[#ca8a04]/40 via-[#eab308]/20 to-[#854d0e]/40 opacity-80 blur transition duration-1000 group-hover:opacity-100 group-hover:duration-200" />
                 <div className="relative rounded-2xl bg-[#070b14] p-2 border border-[#d4af37]/30 shadow-2xl overflow-hidden aspect-[4/5] flex items-center justify-center">
                   <img
-                    src="/src/assets/images/barrister_portrait_1779896056884.png"
+                    src="/src/assets/images/barrister_portrait_1779896056884.jpg"
                     alt="Late Barrister Ibeni Iwolo"
                     className="w-full h-full object-cover rounded-xl grayscale-[15%] group-hover:grayscale-0 transition-all duration-1000 transform group-hover:scale-[1.03]"
                   />
@@ -751,8 +751,8 @@ export default function App() {
                   {selectedChapter === "faith" ? (
                     <>
                       <img 
-                        src="/src/assets/images/stained_glass_1779896081028.png" 
-                        alt="Anglican Cathedral Stained Glass Symbol" 
+                        src="/src/assets/images/stained_glass_1779896081028.jpg" 
+                        alt="Anglican Cathedral Stained Glass Symbol"  
                         className="absolute inset-0 w-full h-full object-cover opacity-80"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />

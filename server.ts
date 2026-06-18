@@ -4,6 +4,17 @@ import fs from "fs";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
+import { initializeApp } from "firebase/app";
+import { 
+  getFirestore, 
+  collection, 
+  getDocs, 
+  setDoc,
+  doc, 
+  updateDoc, 
+  getDoc, 
+  query 
+} from "firebase/firestore";
 
 dotenv.config();
 
@@ -22,10 +33,31 @@ const PORT = 3000;
 
 app.use(express.json());
 
-// Tributes persistence configurations
-const TRIBUTES_FILE_PATH = path.join(process.cwd(), "tributes.json");
+// Initialize Firebase Client
+const firebaseConfigPath = path.join(process.cwd(), "firebase-applet-config.json");
+let db: any = null;
 
-// Default elements in case tributes.json is empty or missing
+if (fs.existsSync(firebaseConfigPath)) {
+  try {
+    const config = JSON.parse(fs.readFileSync(firebaseConfigPath, "utf-8"));
+    const firebaseApp = initializeApp({
+      apiKey: config.apiKey,
+      authDomain: config.authDomain,
+      projectId: config.projectId,
+      storageBucket: config.storageBucket,
+      messagingSenderId: config.messagingSenderId,
+      appId: config.appId
+    });
+    db = getFirestore(firebaseApp, config.firestoreDatabaseId || "(default)");
+    console.log("[FIREBASE SUCCESS] Web Firestore Client initialized in server with project id:", config.projectId);
+  } catch (error) {
+    console.error("Failed to initialize Web Firestore Client:", error);
+  }
+} else {
+  console.warn("firebase-applet-config.json not found!");
+}
+
+// Default elements in case Firestore is empty or missing
 const initialTributes = [
   {
     id: "trib-01",
@@ -65,28 +97,41 @@ const initialTributes = [
   }
 ];
 
-// Read tributes helper
-function loadTributes() {
-  try {
-    if (fs.existsSync(TRIBUTES_FILE_PATH)) {
-      const data = fs.readFileSync(TRIBUTES_FILE_PATH, "utf-8");
-      return JSON.parse(data);
-    } else {
-      fs.writeFileSync(TRIBUTES_FILE_PATH, JSON.stringify(initialTributes, null, 2));
-      return initialTributes;
-    }
-  } catch (err) {
-    console.error("Error reading tributes store, falling back to memory:", err);
+// Async loader helper to sync and seed tributes from/to Firestore
+async function getTributesFromFirestore() {
+  if (!db) {
+    console.warn("Firebase Firestore not initialized! Using fallback.");
     return initialTributes;
   }
-}
-
-// Write tributes helper
-function saveTributes(tributesList: typeof initialTributes) {
   try {
-    fs.writeFileSync(TRIBUTES_FILE_PATH, JSON.stringify(tributesList, null, 2));
+    const tributesRef = collection(db, "tributes");
+    const q = query(tributesRef);
+    const querySnapshot = await getDocs(q);
+    const list: any[] = [];
+    querySnapshot.forEach((docSnap) => {
+      list.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
+    if (list.length === 0) {
+      console.log("Firestore tributes collection is empty. Seeding with initial tributes...");
+      for (const item of initialTributes) {
+        const docRef = doc(db, "tributes", item.id);
+        const { id, ...data } = item;
+        await setDoc(docRef, data);
+        list.push(item);
+      }
+    }
+
+    // Sort: newest date first, break ties with ID string
+    list.sort((a, b) => {
+      const dateCompare = b.date.localeCompare(a.date);
+      if (dateCompare !== 0) return dateCompare;
+      return b.id.localeCompare(a.id);
+    });
+    return list;
   } catch (err) {
-    console.error("Error writing tributes store:", err);
+    console.error("Error loading tributes from Firestore:", err);
+    return initialTributes;
   }
 }
 
@@ -140,13 +185,18 @@ RESPONSE STYLE GUIDELINES:
 `;
 
 // API: Get guest messages
-app.get("/api/tributes", (req, res) => {
-  const tributes = loadTributes();
-  res.json(tributes);
+app.get("/api/tributes", async (req, res) => {
+  try {
+    const tributes = await getTributesFromFirestore();
+    res.json(tributes);
+  } catch (err) {
+    console.error("Error getting tributes:", err);
+    res.status(500).json({ error: "An error occurred fetching tributes." });
+  }
 });
 
 // API: Submit a tribute
-app.post("/api/tributes", (req, res) => {
+app.post("/api/tributes", async (req, res) => {
   try {
     const { name, relation, message, category } = req.body;
     
@@ -154,9 +204,8 @@ app.post("/api/tributes", (req, res) => {
       return res.status(400).json({ error: "Name and message are required." });
     }
 
-    const tributes = loadTributes();
-    const newTribute = {
-      id: `trib-${Date.now()}`,
+    const id = `trib-${Date.now()}`;
+    const newTributeData = {
       name: name.trim().slice(0, 80),
       relation: (relation || "Visitor").trim().slice(0, 100),
       message: message.trim().slice(0, 1000),
@@ -165,10 +214,13 @@ app.post("/api/tributes", (req, res) => {
       category: ["family", "colleague", "church", "community"].includes(category) ? category : "community"
     };
 
-    tributes.unshift(newTribute);
-    saveTributes(tributes);
-
-    res.status(201).json(newTribute);
+    if (db) {
+      const docRef = doc(db, "tributes", id);
+      await setDoc(docRef, newTributeData);
+      res.status(201).json({ id, ...newTributeData });
+    } else {
+      res.status(500).json({ error: "Firestore database not initialized." });
+    }
   } catch (err) {
     console.error("Error creating tribute:", err);
     res.status(500).json({ error: "An error occurred while saving your tribute." });
@@ -176,16 +228,21 @@ app.post("/api/tributes", (req, res) => {
 });
 
 // API: Light virtual candle for a member
-app.post("/api/tributes/:id/light", (req, res) => {
+app.post("/api/tributes/:id/light", async (req, res) => {
   try {
     const { id } = req.params;
-    const tributes = loadTributes();
-    const tribute = tributes.find((t: any) => t.id === id);
+    if (!db) {
+      return res.status(500).json({ error: "Firestore database not initialized." });
+    }
+
+    const docRef = doc(db, "tributes", id);
+    const docSnap = await getDoc(docRef);
     
-    if (tribute) {
-      tribute.candlesLit = (tribute.candlesLit || 0) + 1;
-      saveTributes(tributes);
-      res.json(tribute);
+    if (docSnap.exists()) {
+      const currentData = docSnap.data();
+      const newCandledLit = (currentData.candlesLit || 0) + 1;
+      await updateDoc(docRef, { candlesLit: newCandledLit });
+      res.json({ id: docSnap.id, ...currentData, candlesLit: newCandledLit });
     } else {
       res.status(404).json({ error: "Tribute not found." });
     }

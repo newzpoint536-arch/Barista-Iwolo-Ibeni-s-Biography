@@ -1,0 +1,42 @@
+{
+  "entities": {
+    "tribute": {
+      "title": "Tribute",
+      "description": "A memorial tribute message left by a user, with optional light candles count.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the person leaving the tribute"
+        },
+        "relation": {
+          "type": "string",
+          "description": "Relationship to the deceased"
+        },
+        "message": {
+          "type": "string",
+          "description": "The tribute message"
+        },
+        "date": {
+          "type": "string",
+          "description": "ISO timestamp of when the tribute was created"
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the relationship"
+        },
+        "candlesLit": {
+          "type": "integer",
+          "description": "Number of virtual candles lit for this tribute"
+        }
+      },
+      "required": ["name", "relation", "message", "date", "category"]
+    }
+  },
+  "firestore": {
+    "/tributes/{tributeId}": {
+      "schema": "tribute",
+      "description": "The public tribute wall collection"
+    }
+  }
+}

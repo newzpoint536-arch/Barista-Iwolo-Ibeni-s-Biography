@@ -65,3 +65,31 @@
 .candle-flicker {
   animation: warm-flicker 2.5s infinite ease-in-out;
 }
+
+@keyframes active-flicker {
+  0%, 100% {
+    transform: scale(1.1) rotate(-1deg) translateY(0);
+    filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.9)) brightness(1.1);
+  }
+  20% {
+    transform: scale(0.95) rotate(1deg) translateY(-0.5px);
+    filter: drop-shadow(0 0 4px rgba(234, 179, 8, 0.5)) brightness(1);
+  }
+  40% {
+    transform: scale(1.05) rotate(-2deg) translateY(-1px);
+    filter: drop-shadow(0 0 10px rgba(245, 158, 11, 1)) brightness(1.2);
+  }
+  60% {
+    transform: scale(0.9) rotate(2deg) translateY(0);
+    filter: drop-shadow(0 0 3px rgba(234, 179, 8, 0.4)) brightness(0.95);
+  }
+  80% {
+    transform: scale(1.15) rotate(-0.5deg) translateY(-1.5px);
+    filter: drop-shadow(0 0 12px rgba(251, 191, 36, 1.2)) brightness(1.25);
+  }
+}
+
+.group:hover .candle-flicker {
+  animation: active-flicker 0.45s infinite ease-in-out;
+}
+

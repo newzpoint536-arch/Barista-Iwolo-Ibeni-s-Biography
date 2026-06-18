@@ -81,7 +81,7 @@ const CONSTANT_FILTERS: FilterPreset[] = [
 const GALLERY_DATA: GalleryItem[] = [
   {
     id: "gal-01",
-    src: "/src/assets/images/barrister_portrait_1779896056884.png",
+    src: "/src/assets/images/barrister_portrait_1779896056884.jpg",
     title: "Official Judicial Portrait",
     year: "1987",
     category: "Legal",
@@ -89,7 +89,7 @@ const GALLERY_DATA: GalleryItem[] = [
   },
   {
     id: "gal-02",
-    src: "/src/assets/images/stained_glass_1779896081028.png",
+    src: "/src/assets/images/stained_glass_1779896081028.jpg",
     title: "Memorial Cathedral Stained Glass",
     year: "2010",
     category: "Faith",
@@ -97,7 +97,7 @@ const GALLERY_DATA: GalleryItem[] = [
   },
   {
     id: "gal-03",
-    src: "/src/assets/images/barrister_portrait_1779896056884.png",
+    src: "/src/assets/images/barrister_portrait_1779896056884.jpg",
     title: "Obiyingi Chambers Workdesk Archives",
     year: "1997",
     category: "Legal",
@@ -105,7 +105,7 @@ const GALLERY_DATA: GalleryItem[] = [
   },
   {
     id: "gal-04",
-    src: "/src/assets/images/stained_glass_1779896081028.png",
+    src: "/src/assets/images/stained_glass_1779896081028.jpg",
     title: "The Anglican Communion Ecclesiastical Council",
     year: "2014",
     category: "Faith",
@@ -113,7 +113,7 @@ const GALLERY_DATA: GalleryItem[] = [
   },
   {
     id: "gal-05",
-    src: "/src/assets/images/barrister_portrait_1779896056884.png",
+    src: "/src/assets/images/barrister_portrait_1779896056884.jpg",
     title: "Acting Zonal Chair Address, INC central zone",
     year: "2008",
     category: "Leadership",
@@ -121,7 +121,7 @@ const GALLERY_DATA: GalleryItem[] = [
   },
   {
     id: "gal-06",
-    src: "/src/assets/images/stained_glass_1779896081028.png",
+    src: "/src/assets/images/stained_glass_1779896081028.jpg",
     title: "Diocesan Fellowship Stained Glass",
     year: "2018",
     category: "Family",
