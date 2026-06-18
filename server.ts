@@ -13,7 +13,8 @@ import {
   doc, 
   updateDoc, 
   getDoc, 
-  query 
+  query,
+  deleteDoc
 } from "firebase/firestore";
 
 dotenv.config();
@@ -50,6 +51,19 @@ if (fs.existsSync(firebaseConfigPath)) {
     });
     db = getFirestore(firebaseApp, config.firestoreDatabaseId || "(default)");
     console.log("[FIREBASE SUCCESS] Web Firestore Client initialized in server with project id:", config.projectId);
+    
+    // Clean up sample tributes from Firestore
+    setTimeout(async () => {
+      try {
+        for (const id of ["trib-01", "trib-02", "trib-03", "trib-04"]) {
+          const docRef = doc(db, "tributes", id);
+          await deleteDoc(docRef);
+        }
+        console.log("[FIREBASE SUCCESS] Cleaned up default sample tributes from Firestore.");
+      } catch (err) {
+        console.error("Failed to clean up sample tributes:", err);
+      }
+    }, 1000);
   } catch (error) {
     console.error("Failed to initialize Web Firestore Client:", error);
   }
@@ -58,44 +72,7 @@ if (fs.existsSync(firebaseConfigPath)) {
 }
 
 // Default elements in case Firestore is empty or missing
-const initialTributes = [
-  {
-    id: "trib-01",
-    name: "Hon. Justice Tonye Alagoa",
-    relation: "Colleague / Retired Judge",
-    message: "Barrister Ibeni Iwolo was a lawyer's lawyer. In my courtroom, whenever he rose to speak, we listened. His briefs were meticulous, his decorum was flawless, and his logic was titanium. His legacy lives in the hearts of every lawyer he mentored in Bayelsa State.",
-    candlesLit: 45,
-    date: "2024-06-12",
-    category: "colleague"
-  },
-  {
-    id: "trib-02",
-    name: "Mildred Iwolo",
-    relation: "Daughter",
-    message: "My father taught us that integrity is the only garment that never goes out of style. He was always there to resolve every doubt with a calm smile. In his busy schedule, he never missed a school play, a church choir recitation, or a family discussion. We miss his quiet strength daily.",
-    candlesLit: 120,
-    date: "2024-05-30",
-    category: "family"
-  },
-  {
-    id: "trib-03",
-    name: "Venerable Ezekiel Gbarain",
-    relation: "Anglican Archdeacon",
-    message: "As our Diocesan Secretary and Legal Adviser, Barrister Iwolo shielded the church from dozens of legal traps with absolute devotion and voluntary labor. He would travel hundreds of kilometers on dirt roads to verify a rural church land boundary without charging a single kobo. A true soldier of Christ.",
-    candlesLit: 58,
-    date: "2024-07-02",
-    category: "church"
-  },
-  {
-    id: "trib-04",
-    name: "Chief Preye Alamieyesegha",
-    relation: "INC Community Elder",
-    message: "When the INC was divided, Barrister Ibeni was the bridge. His humility disarmed the angriest youth, and his wisdom silenced the loudest cynics. He brought peace where many thought it impossible. We have lost a true Ijaw statesman whose memory remains forever fresh.",
-    candlesLit: 76,
-    date: "2024-06-25",
-    category: "community"
-  }
-];
+const initialTributes: any[] = [];
 
 // Async loader helper to sync and seed tributes from/to Firestore
 async function getTributesFromFirestore() {

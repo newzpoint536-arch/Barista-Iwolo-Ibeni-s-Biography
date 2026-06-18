@@ -66,8 +66,34 @@ export default function App() {
   const [selectedDocCategory, setSelectedDocCategory] = useState<string>("All");
   const [selectedDoc, setSelectedDoc] = useState<DocumentItem | null>(null);
 
-  // Tributes / Guestbook state
-  const [tributes, setTributes] = useState<Tribute[]>([]);
+  // Tributes / Guestbook state (with localStorage fallback)
+  const [tributes, setTributes] = useState<Tribute[]>(() => {
+    try {
+      const cached = localStorage.getItem("tributes_cache");
+      return cached ? JSON.parse(cached) : BIOGRAPHY_DATA.defaultTributes;
+    } catch (e) {
+      console.warn("Failing to read tributes from localStorage:", e);
+      return BIOGRAPHY_DATA.defaultTributes;
+    }
+  });
+
+  // Documents Metadata state (with localStorage fallback and bookmarks support)
+  const [documentsState, setDocumentsState] = useState<DocumentItem[]>(() => {
+    try {
+      const cached = localStorage.getItem("documents_metadata_cache");
+      if (cached) {
+        return JSON.parse(cached);
+      }
+    } catch (e) {
+      console.warn("Failing to read documents metadata from localStorage:", e);
+    }
+    // Initialize with isBookmarked property injected if not saved
+    return BIOGRAPHY_DATA.documents.map(doc => ({
+      ...doc,
+      isBookmarked: false
+    }));
+  });
+
   const [tributeCategory, setTributeCategory] = useState<"all" | "family" | "colleague" | "church" | "community">("all");
   const [formData, setFormData] = useState({
     name: "",
@@ -223,7 +249,7 @@ export default function App() {
     }
   };
 
-  // API Call: Fetch Tributes
+  // API Call: Fetch Tributes (using localStorage caching fallback)
   const fetchTributes = async () => {
     setLoadingTributes(true);
     try {
@@ -231,18 +257,39 @@ export default function App() {
       if (response.ok) {
         const data = await response.json();
         setTributes(data);
+        try {
+          localStorage.setItem("tributes_cache", JSON.stringify(data));
+        } catch (storageErr) {
+          console.warn("Failing to write tributes to localStorage:", storageErr);
+        }
+      } else {
+        // Response not OK - read from cache if available
+        const cached = localStorage.getItem("tributes_cache");
+        if (cached) {
+          console.info("Using cached tributes list from local storage after status failure.");
+          setTributes(JSON.parse(cached));
+        } else {
+          setTributes(BIOGRAPHY_DATA.defaultTributes);
+        }
+      }
+    } catch (e) {
+      console.warn("Backend unavailable, using cached tributes or default local state.");
+      const cached = localStorage.getItem("tributes_cache");
+      if (cached) {
+        try {
+          setTributes(JSON.parse(cached));
+        } catch (parseErr) {
+          setTributes(BIOGRAPHY_DATA.defaultTributes);
+        }
       } else {
         setTributes(BIOGRAPHY_DATA.defaultTributes);
       }
-    } catch (e) {
-      console.warn("Backend unavailable, using localized mock database state.");
-      setTributes(BIOGRAPHY_DATA.defaultTributes);
     } finally {
       setLoadingTributes(false);
     }
   };
 
-  // API Call: Submit a tribute
+  // API Call: Submit a tribute (saves to cache on success or offline fallback)
   const handleTributeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError("");
@@ -263,7 +310,13 @@ export default function App() {
 
       if (response.ok) {
         const newTribute = await response.json();
-        setTributes((prev) => [newTribute, ...prev]);
+        setTributes((prev) => {
+          const updated = [newTribute, ...prev];
+          try {
+            localStorage.setItem("tributes_cache", JSON.stringify(updated));
+          } catch (storageErr) {}
+          return updated;
+        });
         setFormSuccess(true);
         setFormData({ name: "", relation: "", category: "community", message: "" });
       } else {
@@ -271,6 +324,7 @@ export default function App() {
         setFormError(errorData.error || "An error occurred. Please try again.");
       }
     } catch (err) {
+      console.warn("Offline or submit failed, falling back to local storage and appending locally.");
       // Fallback local append when server offline or during static compilation
       const localNew: Tribute = {
         id: `trib-fallback-${Date.now()}`,
@@ -281,7 +335,13 @@ export default function App() {
         date: new Date().toISOString().split("T")[0],
         category: formData.category as any
       };
-      setTributes((prev) => [localNew, ...prev]);
+      setTributes((prev) => {
+        const updated = [localNew, ...prev];
+        try {
+          localStorage.setItem("tributes_cache", JSON.stringify(updated));
+        } catch (storageErr) {}
+        return updated;
+      });
       setFormSuccess(true);
       setFormData({ name: "", relation: "", category: "community", message: "" });
     } finally {
@@ -292,9 +352,13 @@ export default function App() {
   // API Call: Light a candle for a guest block
   const handleLightCandle = async (id: string) => {
     // Optimistic UI state update
-    setTributes((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, candlesLit: (t.candlesLit || 0) + 1 } : t))
-    );
+    setTributes((prev) => {
+      const updated = prev.map((t) => (t.id === id ? { ...t, candlesLit: (t.candlesLit || 0) + 1 } : t));
+      try {
+        localStorage.setItem("tributes_cache", JSON.stringify(updated));
+      } catch (storageErr) {}
+      return updated;
+    });
 
     try {
       const response = await fetch(`/api/tributes/${id}/light`, {
@@ -303,7 +367,13 @@ export default function App() {
       if (response.ok) {
         const updated = await response.json();
         // Sync with absolute backend coordinates
-        setTributes((prev) => prev.map((t) => (t.id === id ? updated : t)));
+        setTributes((prev) => {
+          const updatedList = prev.map((t) => (t.id === id ? updated : t));
+          try {
+            localStorage.setItem("tributes_cache", JSON.stringify(updatedList));
+          } catch (storageErr) {}
+          return updatedList;
+        });
       }
     } catch (e) {
       console.log("Saving flame count to localized sandbox state.");
@@ -373,8 +443,23 @@ export default function App() {
     "About his fish farm enterprise"
   ];
 
+  // Bookmark/favorite a document and update documents State + localStorage metadata
+  const toggleDocumentBookmark = (id: string) => {
+    setDocumentsState((prev) => {
+      const updated = prev.map((doc) => 
+        doc.id === id ? { ...doc, isBookmarked: !doc.isBookmarked } : doc
+      );
+      try {
+        localStorage.setItem("documents_metadata_cache", JSON.stringify(updated));
+      } catch (e) {
+        console.error("Failing to update documents metadata cache:", e);
+      }
+      return updated;
+    });
+  };
+
   // Filters for Documents catalog
-  const filteredDocs = BIOGRAPHY_DATA.documents.filter((doc) => {
+  const filteredDocs = documentsState.filter((doc) => {
     const matchesCategory = selectedDocCategory === "All" || doc.category === selectedDocCategory;
     const matchesSearch = doc.title.toLowerCase().includes(docSearchQuery.toLowerCase()) || 
                           doc.summary.toLowerCase().includes(docSearchQuery.toLowerCase());
@@ -1412,13 +1497,28 @@ export default function App() {
                     </div>
 
                     <div className="border-t border-slate-900 mt-4 pt-4 flex items-center justify-between">
-                      <span className="text-[10px] text-slate-500">
-                        📄 {doc.pages} Page Brief
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] text-slate-500">
+                          📄 {doc.pages} Page Brief
+                        </span>
+                        
+                        <button
+                          onClick={() => toggleDocumentBookmark(doc.id)}
+                          className={`flex items-center gap-1 text-[10px] px-2 py-0.5 rounded transition-all duration-300 cursor-pointer ${
+                            doc.isBookmarked 
+                              ? "bg-[#eab308]/10 text-[#eab308] border border-[#eab308]/20" 
+                              : "text-slate-500 hover:text-slate-300 border border-transparent"
+                          }`}
+                          title={doc.isBookmarked ? "Unpin document" : "Pin document for offline access"}
+                        >
+                          <BookMarked size={11} />
+                          <span>{doc.isBookmarked ? "Pinned" : "Pin"}</span>
+                        </button>
+                      </div>
                       
                       <button
                         onClick={() => setSelectedDoc(doc)}
-                        className="flex items-center gap-1 text-[11px] font-cinzel text-yellow-500 hover:text-[#d4af37] font-bold tracking-widest uppercase transition-all"
+                        className="flex items-center gap-1 text-[11px] font-cinzel text-yellow-500 hover:text-[#d4af37] font-bold tracking-widest uppercase transition-all cursor-pointer"
                       >
                         <Eye size={12} /> Read Archive
                       </button>
